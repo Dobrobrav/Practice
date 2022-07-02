@@ -1,7 +1,11 @@
-from CODE_3_2_6 import *
+from CODE_3_2_7 import *
 
 if __name__ == '__main__':
-    lst = ["Пункт меню 1", "sdlfkj", "Пункт меню 2", "Пункт меню 3"]
-    render = RenderList("ll")
-    html = render(lst)
-    print(html)
+    @HandlerGET
+    def contact(request):
+        return "Сергей Балакирев"
+
+
+    res = contact({"method": "GET", "url": "contact.html"})
+
+    print(res)
