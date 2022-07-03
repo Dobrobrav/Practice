@@ -2,6 +2,7 @@ from typing import Callable, Mapping, Optional, Dict, Sequence, TypeAlias
 
 
 RequestFunc: TypeAlias = Callable[[Mapping], str]
+DecoratedFunc: TypeAlias = Callable[[Mapping], Optional[str]]
 
 
 class Handler:
@@ -19,7 +20,7 @@ class Handler:
             "POST": self.post,
         }
 
-    def __call__(self, func: RequestFunc) -> Callable[[Mapping], Optional[str]]:
+    def __call__(self, func: RequestFunc) -> DecoratedFunc:
         """ Return function for processing requests. """
         def wrapper(request: Mapping) -> Optional[str]:
             method = request.get("method", "GET")
