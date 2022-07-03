@@ -2,7 +2,7 @@ from typing import Callable, Mapping, Optional
 
 
 class HandlerGET:
-    def __init__(self, func: Callable[..., str]):
+    def __init__(self, func: Callable[[Mapping], str]):
         self._func = func
 
     def __call__(self, request: Mapping) -> Optional[str]:

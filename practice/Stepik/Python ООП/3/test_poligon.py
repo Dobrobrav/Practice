@@ -1,11 +1,9 @@
-from CODE_3_2_7 import *
+from CODE_3_2_8 import *
+
 
 if __name__ == '__main__':
-    @HandlerGET
+    @Handler(methods=('GET', 'POST'))  # по умолчанию methods = ('GET',)
     def contact(request):
         return "Сергей Балакирев"
 
-
-    res = contact({"method": "GET", "url": "contact.html"})
-
-    print(res)
+    print(contact({"method": "POST"}))
