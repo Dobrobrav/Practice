@@ -1,14 +1,14 @@
-from typing import Callable, Union, Optional, List
+from typing import Callable, Union
 
 
 class InputValues:
-    _render: Union[Callable, Callable]
+    _render: Union[Callable, Callable]  # mypy doesn't like single Callable
 
     def __init__(self, render: Callable):
         self._render = render
 
     def __call__(self, func) -> Callable:
-        def wrapper(*args, **kwargs) -> List[Optional[int]]:
+        def wrapper(*args, **kwargs) -> list:
             return [self._render(elem) for elem in func().split()]
 
         return wrapper
