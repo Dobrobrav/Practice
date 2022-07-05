@@ -1,50 +1,38 @@
 from typing import Optional
 
 
-class NodeDesc:
-    def __set_name__(self, owner, name):
-        self.name = f"_{owner.__name__}__{name}"
-
-    def __set__(self, instance, value):
-        setattr(instance, self.name, value)
-
-    def __get__(self, instance, owner):
-        return getattr(instance, self.name)
-
-
 class ObjList:
-    prev: 'Optional[ObjList]' = NodeDesc()
-    next: 'Optional[ObjList]' = NodeDesc()
+    __prev: 'Optional[ObjList]' = None
+    __next: 'Optional[ObjList]' = None
     __data: str
 
     def __init__(self, data: str):
-        self.next = self.prev = None
         self.__data = data
 
     def __repr__(self):
         return self.data
 
-    # @property
-    # def prev(self):
-    #     return self.__prev
-    #
-    # @prev.setter
-    # def prev(self, obj: 'ObjList'):
-    #     if isinstance(obj, ObjList):
-    #         self.__prev = obj
-    #
-    # @property
-    # def next(self):
-    #     return self.__next
-    #
-    # @next.setter
-    # def next(self, obj: 'ObjList'):
-    #     if isinstance(obj, ObjList):
-    #         self.__next = obj
-    #
-    # @next.deleter
-    # def next(self):
-    #     del self.__next
+    @property
+    def prev(self):
+        return self.__prev
+
+    @prev.setter
+    def prev(self, obj: 'ObjList'):
+        if isinstance(obj, ObjList):
+            self.__prev = obj
+
+    @property
+    def next(self):
+        return self.__next
+
+    @next.setter
+    def next(self, obj: 'ObjList'):
+        if isinstance(obj, ObjList):
+            self.__next = obj
+
+    @next.deleter
+    def next(self):
+        del self.__next
 
     @property
     def data(self):
@@ -78,7 +66,7 @@ class LinkedList:
         if obj is None:
             return
         if obj.next is None:
-            obj.prev.next = None
+            del obj.prev.next
             self.tail = obj.prev
         else:
             obj.prev.next = obj.next
@@ -88,7 +76,7 @@ class LinkedList:
     def _find_obj(self, indx: int) -> Optional[ObjList]:
         if indx < 0:
             indx = indx + len(self)
-        if len(self) - indx < 1:
+        if len(self) - indx < 1:  # if there is no element of the index in list
             return None
         if indx <= len(self) // 2:
             return self._forward_search(indx)
