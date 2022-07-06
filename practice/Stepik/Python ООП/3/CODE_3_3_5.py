@@ -76,7 +76,7 @@ class LinkedList:
     def _find_obj(self, indx: int) -> Optional[ObjList]:
         if indx < 0:
             indx = indx + len(self)
-        if len(self) - indx < 1:  # if there is no element of the index in list
+        if len(self) - indx < 1:
             return None
         if indx <= len(self) // 2:
             return self._forward_search(indx)

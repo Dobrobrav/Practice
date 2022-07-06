@@ -1,6 +1,9 @@
-for i in range(10, 20, -1):
-    print(i)
+class Foo:
+    def __len__(self):
+        return None
 
 
+f = Foo()
+print(len(f))  # len can only return integers!
 
 
