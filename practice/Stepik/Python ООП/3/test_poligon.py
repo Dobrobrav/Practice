@@ -1,9 +1,7 @@
-from CODE_3_3_7 import *
+from F3_3_STR_REPR_LEN_ABS.CODE_3_3_8 import *
 
 if __name__ == '__main__':
-    # vector = RadiusVector(*(i for i in range(100_000)))
-    vector = RadiusVector()
-    vector.set_coords(3)
-    vector.set_coords()
-    a, b, c = vector.get_coords()
-    print(a, b, c)
+    dt = DeltaClock(Clock(2, 45, 0), Clock(1, 15, 0))
+    print(dt)  # 01: 30: 00
+    len_dt = len(dt)  # 5400
+    print(f"{len_dt = }")
