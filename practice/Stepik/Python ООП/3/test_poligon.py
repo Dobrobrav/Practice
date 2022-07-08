@@ -1,7 +1,10 @@
-from F3_3_STR_REPR_LEN_ABS.CODE_3_3_8 import *
+from F3_3_STR_REPR_LEN_ABS.CODE_3_3_9 import *
 
 if __name__ == '__main__':
-    dt = DeltaClock(Clock(2, 45, 0), Clock(1, 15, 0))
-    print(dt)  # 01: 30: 00
-    len_dt = len(dt)  # 5400
-    print(f"{len_dt = }")
+    recipe = Recipe()
+    recipe.add_ingredient(Ingredient("Соль", 1, "столовая ложка"))
+    recipe.add_ingredient(Ingredient("Мука", 1, "кг"))
+    recipe.add_ingredient(Ingredient("Мясо баранины", 10, "кг"))
+    ings = recipe.get_ingredients()
+    n = len(recipe)  # n = 3
+    print(n)
