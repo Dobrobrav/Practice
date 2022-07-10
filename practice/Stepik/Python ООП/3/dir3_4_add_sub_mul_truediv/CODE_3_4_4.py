@@ -1,6 +1,6 @@
 from typing import TypeAlias, Any
 
-Listable: TypeAlias = list | 'NewList'
+Listable: TypeAlias = 'list | NewList'
 
 
 class NewList:
