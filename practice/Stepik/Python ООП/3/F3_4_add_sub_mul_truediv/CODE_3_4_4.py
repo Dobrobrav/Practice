@@ -1,6 +1,6 @@
-from typing import Optional, Union, Any
+from typing import Optional, Union, TypeAlias, Any
 
-Listable = Union[list, 'NewList']
+Listable: TypeAlias = Union[list, 'NewList']
 
 
 class NewList:
@@ -21,7 +21,7 @@ class NewList:
         difference_list = self._get_difference_list(reduced, deductible)
         return NewList(difference_list)
 
-    def __isub__(self, other: Listable):  # var -= <NewList([b, c, d]) or [b, c, d]>
+    def __isub__(self, other: Listable):  # list_var -= <NewList([b, c, d]) or [b, c, d]>
         reduced = self.get_list()
         deductible = other if isinstance(other, list) else other.get_list()
         self._inner_list = self._get_difference_list(reduced, deductible)
