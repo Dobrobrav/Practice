@@ -1,9 +1,11 @@
-class Foo:
-    def __len__(self):
-        return None
+class Num:
+    def __init__(self, num: int):
+        self.num = num
+
+    def __add__(self, other: int):
+        return self.num + other
 
 
-f = Foo()
-print(len(f))  # len can only return integers!
+num = Num(15)
 
-
+print(15 + num)

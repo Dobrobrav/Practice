@@ -1,10 +1,14 @@
-from F3_3_STR_REPR_LEN_ABS.CODE_3_3_9 import *
+from F3_4_add_sub_mul_truediv.CODE_3_4_4 import *
 
 if __name__ == '__main__':
-    recipe = Recipe()
-    recipe.add_ingredient(Ingredient("Соль", 1, "столовая ложка"))
-    recipe.add_ingredient(Ingredient("Мука", 1, "кг"))
-    recipe.add_ingredient(Ingredient("Мясо баранины", 10, "кг"))
-    ings = recipe.get_ingredients()
-    n = len(recipe)  # n = 3
-    print(n)
+    lst1 = NewList([1, 2, -4, 6, 10, 11, 15, False, True])
+    lst2 = NewList([0, 1, 2, 3, True])
+    res_1 = lst1 - lst2  # NewList: [-4, 6, 10, 11, 15, False]
+    lst1 -= lst2  # NewList: [-4, 6, 10, 11, 15, False]
+    res_2 = lst2 - [0, True]  # NewList: [1, 2, 3]
+    res_3 = [1, 2, 3, 4.5] - res_2  # NewList: [4.5]
+    a = NewList([2, 3])
+    res_4 = [1, 2, 2, 3] - a  # NewList: [1, 2]
+
+    lst = NewList()
+    print(lst.get_list())
