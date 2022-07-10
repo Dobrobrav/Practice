@@ -9,25 +9,29 @@ class NewList:
     def __init__(self, list_: Optional[list] = None):
         self._inner_list = list_ or []
 
-    def __sub__(self, other: Listable):
-        other = other if isinstance(other, list) else other.get_list()
-        new_list = self._get_resulting_list(self.get_list(), other)
-        return NewList(new_list)
+    def __sub__(self, other: Listable):  # NewList([a, b, c]) - <NewList([b, c, d]) or [b, c, d]>
+        reduced = self.get_list()
+        deductible = other if isinstance(other, list) else other.get_list()
+        difference_list = self._get_difference_list(reduced, deductible)
+        return NewList(difference_list)
 
-    def __rsub__(self, other: list):  # new_list2 = [a, b, c] - new_list1
-        new_list = self._get_resulting_list(other, self.get_list())
-        return NewList(new_list)
+    def __rsub__(self, other: list):  # [a, b, c] - NewList([b, c, d])
+        reduced = other
+        deductible = self.get_list()
+        difference_list = self._get_difference_list(reduced, deductible)
+        return NewList(difference_list)
 
-    def __isub__(self, other: Listable):  # new_list -= [a, b, c]
-        other = other if isinstance(other, list) else other.get_list()
-        self._inner_list = self._get_resulting_list(self.get_list(), other)
+    def __isub__(self, other: Listable):  # var -= <NewList([b, c, d]) or [b, c, d]>
+        reduced = self.get_list()
+        deductible = other if isinstance(other, list) else other.get_list()
+        self._inner_list = self._get_difference_list(reduced, deductible)
         return self
 
-    def __repr__(self):
+    def __repr__(self):  # [a, b, c] -> NewList([a, b, c])
         return f"NewList({str(self.get_list())})"
 
     @classmethod
-    def _get_resulting_list(cls, reduced: list, deductible: list) -> list:
+    def _get_difference_list(cls, reduced: list, deductible: list) -> list:
         """  Return resulting list after subtraction. """
         deductible = deductible.copy()
         resulting_list = [
