@@ -1,12 +1,12 @@
-from typing import Optional, Union, TypeAlias, Any
+from typing import TypeAlias, Any
 
-Listable: TypeAlias = Union[list, 'NewList']
+Listable: TypeAlias = list | 'NewList'
 
 
 class NewList:
     _inner_list: list
 
-    def __init__(self, list_: Optional[list] = None):
+    def __init__(self, list_: list | None = None):
         self._inner_list = list_ or []
 
     def __sub__(self, other: Listable):  # NewList([a, b, c]) - <NewList([b, c, d]) or [b, c, d]>
@@ -42,7 +42,8 @@ class NewList:
     @staticmethod
     def _find_in_list(value: Any, list_: list) -> bool:
         """ Return False if list_ doesn't contain value;
-        Return True and REMOVE one instance of value from list_ if list_ contains value.
+        Return True and REMOVE one instance of value from list_
+         if list_ contains value.
         """
         if all(value != list_elem or type(value) is not type(list_elem)
                for list_elem in list_):
