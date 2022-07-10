@@ -1,4 +1,4 @@
-from F3_4_add_sub_mul_truediv.CODE_3_4_4 import *
+from dir3_4_add_sub_mul_truediv.CODE_3_4_4 import *
 
 if __name__ == '__main__':
     lst1 = NewList([1, 2, -4, 6, 10, 11, 15, False, True])
@@ -9,6 +9,3 @@ if __name__ == '__main__':
     res_3 = [1, 2, 3, 4.5] - res_2  # NewList: [4.5]
     a = NewList([2, 3])
     res_4 = [1, 2, 2, 3] - a  # NewList: [1, 2]
-
-    lst = NewList()
-    print(lst.get_list())
