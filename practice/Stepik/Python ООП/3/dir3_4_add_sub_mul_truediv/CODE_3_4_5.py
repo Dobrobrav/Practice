@@ -1,4 +1,4 @@
-from typing import Optional, List, Callable
+from typing import Callable
 
 
 # from ma
@@ -11,9 +11,9 @@ class ListMath:
     and redefining some others.
     """
 
-    lst_math: List[float]
+    lst_math: list[float]
 
-    def __init__(self, list_: Optional[list] = None):
+    def __init__(self, list_: list | None = None):
         if list_ is None:
             self.lst_math = []
         else:
@@ -90,7 +90,7 @@ class ListMath:
             list_: list,
             number: float,
             operation: Callable,
-    ) -> List[float]:
+    ) -> list[float]:
         result_of_operation = [round(operation(list_value, number), 13)
                                for list_value in list_]
         return result_of_operation
