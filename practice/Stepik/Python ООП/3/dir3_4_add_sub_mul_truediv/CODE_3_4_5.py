@@ -1,9 +1,6 @@
 from typing import Callable
 
 
-# from ma
-
-
 class ListMath:
     """ Class that changes functionality of regular lists
     in terms of arithmetical operational

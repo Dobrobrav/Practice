@@ -5,6 +5,9 @@ class Num:
     def __add__(self, other: int):
         return self.num + other
 
+    def __radd__(self, other):
+        return other + self.num
+
 
 num = Num(15)
 

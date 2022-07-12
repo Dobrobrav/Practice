@@ -1,11 +1,19 @@
-from dir3_4_add_sub_mul_truediv.CODE_3_4_4 import *
+from dir3_4_add_sub_mul_truediv.CODE_3_4_6 import *
 
 if __name__ == '__main__':
-    lst1 = NewList([1, 2, -4, 6, 10, 11, 15, False, True])
-    lst2 = NewList([0, 1, 2, 3, True])
-    res_1 = lst1 - lst2  # NewList: [-4, 6, 10, 11, 15, False]
-    lst1 -= lst2  # NewList: [-4, 6, 10, 11, 15, False]
-    res_2 = lst2 - [0, True]  # NewList: [1, 2, 3]
-    res_3 = [1, 2, 3, 4.5] - res_2  # NewList: [4.5]
-    a = NewList([2, 3])
-    res_4 = [1, 2, 2, 3] - a  # NewList: [1, 2]
+    stack = Stack()
+    for i in range(5):
+        stack.push_back(StackObj(str(i)))
+
+    for i in range(2):
+        obj = stack.pop_back()
+
+    # добавление нового объекта класса StackObj в конец односвязного списка st
+    stack = stack + StackObj('11')
+    stack += StackObj('12')
+
+    # добавление нескольких объектов в конец односвязного списка
+    stack = stack * ['data_1', 'data_2', ..., 'data_N']
+    stack *= ['data_1', 'data_2', ..., 'data_N']
+    print(stack)
+
