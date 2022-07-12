@@ -13,7 +13,6 @@ class StackObj:
     def __repr__(self):
         return str(self.__data)
 
-
     @property
     def next(self) -> 'StackObj | None':
         return self.__next
