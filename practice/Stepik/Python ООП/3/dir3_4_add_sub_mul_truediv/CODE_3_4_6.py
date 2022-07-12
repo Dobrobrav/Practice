@@ -5,6 +5,7 @@ class StackObj:
     """ Class that represents nodes of Stack. """
 
     __data: str
+    __next: 'StackObj | None' = None
 
     def __init__(self, data: str):
         self.__data = data
@@ -12,7 +13,6 @@ class StackObj:
     def __repr__(self):
         return str(self.__data)
 
-    __next: 'StackObj | None' = None
 
     @property
     def next(self) -> 'StackObj | None':
