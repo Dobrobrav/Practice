@@ -25,7 +25,7 @@ class Lib:
         self.book_list.append(other)
         return self
 
-    def __iadd__(self, other):
+    def __iadd__(self, other: Book) -> 'Lib':
         return self + other
 
     def __sub__(self, other: Book | int) -> 'Lib':  # doesn't create new instance
@@ -35,7 +35,7 @@ class Lib:
             self.book_list.remove(other)
         return self
 
-    def __isub__(self, other):
+    def __isub__(self, other: Book | int) -> 'Lib':
         return self - other
 
     def __len__(self):
