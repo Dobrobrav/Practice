@@ -1,19 +1,14 @@
-from dir3_4_add_sub_mul_truediv.CODE_3_4_6 import *
+from dir3_4_add_sub_mul_truediv.CODE_3_4_8 import *
 
 if __name__ == '__main__':
-    stack = Stack()
-    for i in range(5):
-        stack.push_back(StackObj(str(i)))
+    my_budget = Budget()
+    my_budget.add_item(Item("Курс по Python ООП", 2000))
+    my_budget.add_item(Item("Курс по Django", 5000.01))
+    my_budget.add_item(Item("Курс по NumPy", 0))
+    my_budget.add_item(Item("Курс по C++", 1500.10))
 
-    for i in range(2):
-        obj = stack.pop_back()
-
-    # добавление нового объекта класса StackObj в конец односвязного списка st
-    stack = stack + StackObj('11')
-    stack += StackObj('12')
-
-    # добавление нескольких объектов в конец односвязного списка
-    stack = stack * ['data_1', 'data_2', ..., 'data_N']
-    stack *= ['data_1', 'data_2', ..., 'data_N']
-    print(stack)
+    # вычисление общих расходов
+    s = 0
+    for x in my_budget.get_items():
+        s = s + x
 
