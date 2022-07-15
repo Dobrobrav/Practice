@@ -9,7 +9,7 @@ class Item:
         self.name = name
         self.money = money
 
-    def __add__(self, other: 'Item | float'):
+    def __add__(self, other: 'Item | float') -> float:
         if type(other) in (int, float):
             total_money = self.money + other
         else:
