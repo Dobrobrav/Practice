@@ -1,4 +1,6 @@
-from typing import List, Sequence, NamedTuple, Optional
+from typing import Sequence, NamedTuple, Optional, TypeAlias
+
+Matrix: TypeAlias = Sequence[Sequence[float]]
 
 
 class Step(NamedTuple):
@@ -23,13 +25,15 @@ class MaxPooling:
         return (f"step: {self.step.vertical}, {self.step.horizontal}; "
                 f"size: {self.size.vertical}, {self.step.horizontal}")
 
-    def __call__(self, matrix: Sequence[Sequence[float]]) -> List[List[float]]:
+    def __call__(self, matrix: Matrix) -> list[list[float]]:
+        """ Return the max-pooling matrix
+         that process areas of the given size with given step. """
         if (any(type(value) not in (int, float)
                 for row in matrix for value in row)
                 or any(len(row) != len(matrix[0]) for row in matrix)):
             raise ValueError("Неверный формат для первого параметра matrix.")
 
-        max_pooling = [  # requires renaming because the name has been taken
+        max_pooling = [
             [self._calc_area_max_value(matrix, i, j)
              for j in range(0, len(matrix[0]), self.step.horizontal)
              if self._calc_area_max_value(matrix, i, j) is not None]
@@ -38,16 +42,18 @@ class MaxPooling:
         max_pooling = [row for row in max_pooling if row != []]
         return max_pooling
 
-    def _calc_area_max_value(self, matrix: Sequence[Sequence[float]],
+    def _calc_area_max_value(self, matrix: Matrix,
                              i: int, j: int) -> Optional[float]:
-        sub_matrix = [  # may be unnecessary use of the comprehension
-            [value for value in row[j: j + self.size.horizontal]]
+        """ Return the max value of the given area from the matrix. """
+        sub_matrix = [
+            row[j: j + self.size.horizontal]
             for row in matrix[i: i + self.size.vertical]
         ]
         area_of_sub_matrix = sum(len(row) for row in sub_matrix)
 
         if area_of_sub_matrix < self.size.horizontal * self.size.vertical:
             return None
+
         max_value = max(
             value
             for row in sub_matrix
