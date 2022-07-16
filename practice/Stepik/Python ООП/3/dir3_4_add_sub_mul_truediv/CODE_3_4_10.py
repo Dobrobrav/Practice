@@ -39,7 +39,8 @@ class MaxPooling:
              if self._calc_area_max_value(matrix, i, j) is not None]
             for i in range(0, len(matrix), self.step.vertical)
         ]
-        max_pooling = [row for row in max_pooling if row != []]
+        # max_pooling = [row for row in max_pooling if row != []]
+        max_pooling = filter(lambda row: row != [], max_pooling)
         return max_pooling
 
     def _calc_area_max_value(self, matrix: Matrix,
