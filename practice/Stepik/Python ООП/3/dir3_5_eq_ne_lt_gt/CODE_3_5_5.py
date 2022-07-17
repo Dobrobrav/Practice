@@ -11,9 +11,9 @@ class StringText:
     """ Class that represents a string of words and has a list of these words;
      the class implements operations '<', '>', '<=', '>='. '"""
 
-    lst_words: List[str]
+    lst_words: list[str]
 
-    def __init__(self, lst_words: List[str]):
+    def __init__(self, lst_words: list[str]):
         self.lst_words = lst_words
 
     def __len__(self):
