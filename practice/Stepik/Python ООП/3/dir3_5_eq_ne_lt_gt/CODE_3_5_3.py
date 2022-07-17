@@ -32,17 +32,17 @@ class Track:
 
     _start_x: float
     _start_y: float
-    _track_lines: list[TrackLine]
+    _route: list[TrackLine]
     _current_length: float
 
     def __init__(self, start_x: float, start_y: float):
-        self._track_lines = [TrackLine(start_x, start_y, 0)]
+        self._route = [TrackLine(start_x, start_y, 0)]
         self._current_length = 0
         self._start_x = start_x
         self._start_y = start_y
 
     def __len__(self):
-        """ Return length of track parsed to int. """
+        """ Return length of track, parsed to int. """
         return int(self._current_length)
 
     def __eq__(self, other: object) -> bool:
@@ -54,17 +54,17 @@ class Track:
         return len(self) > len(other)
 
     def __repr__(self):
-        return f"{self._track_lines}; length: {self._current_length}"
+        return f"{self._route}; length: {self._current_length}"
 
     def add_track(self, tr: TrackLine) -> None:
         self._current_length += sqrt(
-            (tr.to_x - self._track_lines[-1].to_x) ** 2
-            + (tr.to_y - self._track_lines[-1].to_y) ** 2
+            (tr.to_x - self._route[-1].to_x) ** 2
+            + (tr.to_y - self._route[-1].to_y) ** 2
         )
-        self._track_lines.append(tr)
+        self._route.append(tr)
 
     def get_tracks(self) -> tuple[TrackLine, ...]:
-        return tuple(self._track_lines)
+        return tuple(self._route)
 
 
 if __name__ == '__main__':
