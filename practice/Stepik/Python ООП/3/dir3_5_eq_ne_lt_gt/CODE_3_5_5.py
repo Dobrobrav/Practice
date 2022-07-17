@@ -9,7 +9,8 @@ stich = ["Я к вам пишу – чего же боле?",
 
 class StringText:
     """ Class that represents a string of words and has a list of these words;
-     the class implements operations '<', '>', '<=', '>='. '"""
+    the class implements operations '<', '>', '<=', '>='.
+    """
 
     lst_words: list[str]
 
