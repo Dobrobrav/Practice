@@ -1,14 +1,17 @@
-from typing import Sequence, NamedTuple, Optional, TypeAlias
+from typing import Sequence, TypeAlias
+from dataclasses import dataclass
 
 Matrix: TypeAlias = Sequence[Sequence[float]]
 
 
-class Step(NamedTuple):
+@dataclass
+class Step:
     vertical: int
     horizontal: int
 
 
-class Size(NamedTuple):
+@dataclass
+class Size:
     vertical: int
     horizontal: int
 
@@ -39,12 +42,12 @@ class MaxPooling:
              if self._calc_area_max_value(matrix, i, j) is not None]
             for i in range(0, len(matrix), self.step.vertical)
         ]
-        # max_pooling = [row for row in max_pooling if row != []]
-        max_pooling = filter(lambda row: row != [], max_pooling)
+        max_pooling = [row for row in max_pooling if row != []]
+        # max_pooling = filter(lambda row: row != [], max_pooling)
         return max_pooling
 
     def _calc_area_max_value(self, matrix: Matrix,
-                             i: int, j: int) -> Optional[float]:
+                             i: int, j: int) -> float | None:
         """ Return the max value of the given area from the matrix. """
         sub_matrix = [
             row[j: j + self.size.horizontal]
