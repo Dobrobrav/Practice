@@ -1,16 +1,13 @@
-from typing import Sequence, TypeAlias
-from dataclasses import dataclass
+from typing import Sequence, TypeAlias, NamedTuple
 
 Matrix: TypeAlias = Sequence[Sequence[float]]
 
 
-@dataclass
-class Step:
+class Step(NamedTuple):
     vertical: int
     horizontal: int
 
 
-@dataclass
 class Size:
     vertical: int
     horizontal: int
