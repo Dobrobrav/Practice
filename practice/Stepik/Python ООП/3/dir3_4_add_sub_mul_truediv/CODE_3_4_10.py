@@ -8,7 +8,7 @@ class Step(NamedTuple):
     horizontal: int
 
 
-class Size:
+class Size(NamedTuple):
     vertical: int
     horizontal: int
 
