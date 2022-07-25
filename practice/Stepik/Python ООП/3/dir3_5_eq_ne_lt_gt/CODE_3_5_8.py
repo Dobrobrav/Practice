@@ -1,7 +1,10 @@
-from typing import Type, Optional
-
-
 class CentralBank:
+    """ Class that represents central bank that contains currency rates
+    and does not support creating self instances.
+
+    Class implements method:
+     - .register for associating <Money> instances with this bank
+    """
     rates = {'rub': 72.5, 'dollar': 1.0, 'euro': 1.15}
 
     def __new__(cls, *args, **kwargs):
@@ -9,12 +12,19 @@ class CentralBank:
 
     @classmethod
     def register(cls, money: 'Money'):
+        """ Associate <Money> instance with this bank """
         money.cb = cls
 
 
 class Money:
+    """ Class that represents money and 'knows' the money volume
+    and the CentralBank it's associated with.
+
+    Implements all the comparison operators supporting inter-currency comparison.
+    """
+
     __volume: int
-    __cb: Optional[Type[CentralBank]] = None
+    __cb = None
 
     _literals_for_currency = {
         'MoneyD': 'dollar',
@@ -42,10 +52,10 @@ class Money:
     def __ge__(self, other: object) -> bool:
         return self > other or self == other
 
-    def __repr__(self):
-        compared_rubles = self._get_rub_equivalent() if self.cb else 'unknown'
+    def __repr__(self):  # example: '10 dollar ~ 725 rub' or '10 dollar ~ unknown rub'
+        rub_equivalent = self._get_rub_equivalent() if self.cb else 'unknown'
         literals = self._literals_for_currency[self.__class__.__name__]
-        return f"{self.volume} {literals} ~ {compared_rubles} rub"
+        return f"{self.volume} {literals} ~ {rub_equivalent} rub"
 
     def _get_rub_equivalent(self) -> float:
         if isinstance(self, MoneyR):
@@ -66,23 +76,28 @@ class Money:
         self.__volume = int(volume * 100)
 
     @property
-    def cb(self) -> Optional[Type[CentralBank]]:
+    def cb(self):
+        if self.__cb is None:
+            raise ValueError("Неизвестен курс валют.")
         return self.__cb
 
     @cb.setter
-    def cb(self, cb: Type[CentralBank]):
+    def cb(self, cb):
         self.__cb = cb
 
 
 class MoneyR(Money):
+    """ Class that represents rubles <Money> """
     pass
 
 
 class MoneyD(Money):
+    """ Class that represents dollars <Money> """
     pass
 
 
 class MoneyE(Money):
+    """ Class that represents euro <Money> """
     pass
 
 
