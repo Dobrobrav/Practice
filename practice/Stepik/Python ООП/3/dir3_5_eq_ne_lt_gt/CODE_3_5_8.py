@@ -88,17 +88,14 @@ class Money:
 
 class MoneyR(Money):
     """ Class that represents rubles <Money> """
-    pass
 
 
 class MoneyD(Money):
     """ Class that represents dollars <Money> """
-    pass
 
 
 class MoneyE(Money):
     """ Class that represents euro <Money> """
-    pass
 
 
 if __name__ == '__main__':
