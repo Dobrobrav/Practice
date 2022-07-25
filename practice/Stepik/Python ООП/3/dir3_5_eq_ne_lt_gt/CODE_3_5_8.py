@@ -20,7 +20,8 @@ class Money:
     """ Class that represents money and 'knows' the money volume
     and the CentralBank it's associated with.
 
-    Implements all the comparison operators supporting inter-currency comparison.
+    Implements all the comparison operators
+    supporting inter-currency comparison.
     """
 
     __volume: int
@@ -52,7 +53,7 @@ class Money:
     def __ge__(self, other: object) -> bool:
         return self > other or self == other
 
-    def __repr__(self):  # example: '10 dollar ~ 725 rub' or '10 dollar ~ unknown rub'
+    def __repr__(self):  # i.e.'10 dollar ~ 725 rub' or '10 dollar ~ unknown rub'
         rub_equivalent = self._get_rub_equivalent() if self.cb else 'unknown'
         literals = self._literals_for_currency[self.__class__.__name__]
         return f"{self.volume} {literals} ~ {rub_equivalent} rub"
