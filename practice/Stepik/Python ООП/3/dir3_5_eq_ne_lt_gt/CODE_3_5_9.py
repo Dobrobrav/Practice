@@ -28,10 +28,16 @@ class Body:
         return self.mass < other.mass if isinstance(other, Body) else other
 
 
+class Foo:
+    def __eq__(self, other):
+        return NotImplemented
+
+
 if __name__ == '__main__':
     b1 = Body("sdf", 15, 34)
     b2 = Body("sdf", 15, 34)
+    f = Foo()
 
-    a = b1 == 'df'
+    a = b1 == f
 
     print(a)
