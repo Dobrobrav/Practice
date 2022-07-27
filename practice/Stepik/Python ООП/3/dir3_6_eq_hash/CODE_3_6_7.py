@@ -64,11 +64,13 @@ class DataBase:
         else:
             self.dict_db[record].append(record)
 
-    def read(self, pk: int) -> Record:
+    def read(self, pk: int) -> Record | None:
         for record_list in self.dict_db.values():
             for record in record_list:
                 if record.pk == pk:
                     return record
+
+        return None
 
 
 if __name__ == '__main__':
