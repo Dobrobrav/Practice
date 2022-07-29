@@ -15,6 +15,5 @@ class Line:
         self.y2 = y2
 
     def __len__(self):
-        if sqrt((self.y2 - self.y1) ** 2 + (self.x2 - self.x1) ** 2) < 1:
-            return 0
-        return 1
+        return int(sqrt((self.y2 - self.y1) ** 2 + (self.x2 - self.x1) ** 2))
+
