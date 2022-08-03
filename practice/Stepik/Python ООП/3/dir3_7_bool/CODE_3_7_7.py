@@ -20,10 +20,10 @@ class Ellipse:
             raise AttributeError('type either all coordinates or none of them')
 
         if all(coord is not None for coord in (x1, y1, x2, y2)):
-            self.x1 = x1
-            self.y1 = y1
-            self.x2 = x2
-            self.y2 = y2
+            self.x1 = x1  # type: ignore
+            self.y1 = y1  # type: ignore
+            self.x2 = x2  # type: ignore
+            self.y2 = y2  # type: ignore
 
     def __bool__(self):
         """ Return True if all 4 coordinates are defined. """
