@@ -95,6 +95,7 @@ class GamePole(metaclass=MetaSingleton):
         self.__pole_cells = tuple(tuple(Cell() for _ in range(self.M))
                                   for _ in range(self.N))
 
+        # setting up mines
         mines_to_set_up = self.total_mines
         while mines_to_set_up > 0:
             cell_to_mine = self.pole[randint(0, self.N - 1)][randint(0, self.M - 1)]
@@ -104,6 +105,7 @@ class GamePole(metaclass=MetaSingleton):
             cell_to_mine.is_mine = True
             mines_to_set_up -= 1
 
+        # counting mines around
         for i, row in enumerate(self.pole):
             for j, cell in enumerate(row):
                 if not cell.is_mine:
@@ -122,6 +124,7 @@ class GamePole(metaclass=MetaSingleton):
             raise IndexError('некорректные индексы i, j клетки игрового поля')
 
     def _count_mines_around(self, i: int, j: int) -> int:
+        # creating a frame of clear mines around the field
         wrapped_pole = (
                 [[Cell()] * (len(self.pole) + 2)]
                 + [[Cell()] + list(row) + [Cell()] for row in self.pole]
