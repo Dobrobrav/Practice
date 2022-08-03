@@ -70,6 +70,6 @@ class Vector:
             is_vector = False
 
         for i, coord in enumerate(self.coords):
-            operand = other.coords[i] if is_vector else other
+            operand = other.coords[i] if is_vector else other  # type: ignore
             coords.append(operation(coord, operand))
         return coords
