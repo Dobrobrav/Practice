@@ -25,7 +25,7 @@ class Track:
         """ Return coords and speed. """
         self._check_index(item)
         return (self.linear_segments[item].coords,
-                self.linear_segments[item].speed)  # type: ignore
+                self.linear_segments[item].speed)
 
     def __setitem__(self, key: int, value: float):
         """ Only change speed. """
