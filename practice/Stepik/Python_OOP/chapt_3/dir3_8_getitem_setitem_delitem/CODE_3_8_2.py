@@ -20,3 +20,8 @@ class Record:
         if not ((isinstance(index, int)
                  and 0 <= index <= len(self._key_by_id) - 1)):
             raise IndexError('неверный индекс поля')
+
+
+if __name__ == '__main__':
+    record = Record(id=1, name='some_name', age=18)
+    print(record.__dict__)
