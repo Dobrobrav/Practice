@@ -60,29 +60,32 @@ class TicTacToe:
     def _get_column(self, column_index: int) -> Tuple[int, ...]:
         return tuple(row[column_index].value for row in self.pole)
 
-    def _check_index(self, index: Any, allow_slices=False):
+    @classmethod
+    def _check_index(cls, index: Any, allow_slices=False):
         if not isinstance(index, tuple) or len(index) != 2:
             raise IndexError('неверный индекс клетки')
 
         if (allow_slices
                 and any(isinstance(e, slice) for e in index)
                 and any(type(e) is int for e in index)):
-            self._check_slice_index(index)
+            cls._check_slice_index(index)
         elif all(type(e) is int for e in index):
-            self._check_single_elem_index(index)  # type: ignore
+            cls._check_single_elem_index(index)  # type: ignore
         else:
             raise IndexError('неверный индекс клетки')
 
-    def _check_single_elem_index(self, single_index: Tuple[int, int]):
-        if not all(0 <= e <= self.POLE_SIZE - 1
+    @classmethod
+    def _check_single_elem_index(cls, single_index: Tuple[int, int]):
+        if not all(0 <= e <= cls.POLE_SIZE - 1
                    for e in single_index):
             raise IndexError('неверный индекс клетки')
 
-    def _check_slice_index(self, slice_index: tuple):
+    @classmethod
+    def _check_slice_index(cls, slice_index: tuple):
         num, slice_ = slice_index
         if isinstance(num, slice):
             num, slice_ = slice_, num
-        if not (0 <= num <= self.POLE_SIZE - 1
+        if not (0 <= num <= cls.POLE_SIZE - 1
                 and slice_ == slice(None, None, None)):
             raise IndexError('неверный индекс клетки')
 
