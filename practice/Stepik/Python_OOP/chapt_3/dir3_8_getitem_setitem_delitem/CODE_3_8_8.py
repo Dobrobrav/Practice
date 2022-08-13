@@ -12,7 +12,7 @@ class Cell:
 class TicTacToe:
     """ Tic-tac-toe game field.
     Allows access to fields by [i, j] index,
-    supports [:, j] and [i, :] indexes, as well.
+    also supports [:, j] and [i, :] indexes for GETTING item.
     """
 
     pole: Tuple[Tuple[Cell, ...], ...]
@@ -34,11 +34,13 @@ class TicTacToe:
     def __getitem__(self, item: tuple) -> Tuple[int, ...]:
         """ Return item or tuple of items, depending on input index. """
         self._check_index(item, allow_slices=True)
-        if all(isinstance(e, int) for e in item):
-            return self.pole[item[0]][item[1]].value
-        elif item[0] == slice(None, None, None):
+        x, y = item
+        if isinstance(x, slice):
             return self._get_column(item[1])
-        return self._get_row(item[0])  # item[1] == slice(None, None, None)
+        elif isinstance(y, slice):
+            return self._get_row(item[0])
+
+        return self.pole[x][y].value
 
     def __repr__(self):
         return '\n'.join(
@@ -47,7 +49,10 @@ class TicTacToe:
         )
 
     def clear(self):
-        self.__init__()
+        for i in range(3):
+            for j in range(3):
+                self.pole[i][j].value = 0
+                self.pole[i][j].is_free = True
 
     def _get_row(self, row_index) -> Tuple[int, ...]:
         return tuple(cell.value for cell in self.pole[row_index])
