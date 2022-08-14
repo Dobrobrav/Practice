@@ -27,7 +27,7 @@ class Bag:
         weight_to_remove = 0 if index is None else self._things[index].weight
         self._check_weight(thing.weight, weight_to_remove)
 
-        if index:
+        if index is not None:
             self._things[index] = thing
         else:
             self._things.append(thing)
@@ -36,6 +36,7 @@ class Bag:
         self._current_weight += thing.weight
 
     def __setitem__(self, key: int, value: Thing):
+        self._check_index(key)
         self.add_thing(value, key)
 
     def __getitem__(self, item: int) -> Thing:
@@ -53,5 +54,7 @@ class Bag:
             raise ValueError('превышен суммарный вес предметов')
 
     def _check_index(self, index: int):
-        if not (type(index) is int and 0 <= index < len(self._things)):
+        is_int = type(index) is int
+        if not (is_int and (0 <= index < len(self._things)
+                            or -len(self._things) <= index <= -1)):
             raise IndexError('неверный индекс')
