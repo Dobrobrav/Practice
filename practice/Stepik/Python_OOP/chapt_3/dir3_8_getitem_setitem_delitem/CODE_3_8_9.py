@@ -13,7 +13,7 @@ class Thing:
 class Bag:
     _things: list[Thing]
     _max_weight: float
-    _current_weight = 0
+    _current_weight = 0.0
 
     def __init__(self, max_weight: float):
         self._max_weight = max_weight
