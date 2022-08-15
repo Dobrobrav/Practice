@@ -34,10 +34,8 @@ class Person:
             raise StopIteration
 
         attr_name = self._attr_name_by_index[self._current_iter_index]
-        ret_value = getattr(self, attr_name)
         self._current_iter_index += 1
-
-        return ret_value
+        return getattr(self, attr_name)
 
     def _check_index(self, index: int):
         if not (type(index) is int
