@@ -69,15 +69,22 @@ def test_person_getitem_error(person, index):
 
 
 def test_person_iter(person):
-    pass
+    person._current_iter_index = 5
+    it = iter(person)
+    assert it is person and person._current_iter_index == 0
 
 
 def test_person_next(person):
-    pass
+    assert (('Bill Gates', 'businessman', 61, 1_000_000, 46)
+            == tuple(value for value in person))
 
 
 def test_person_next_error(person):
-    pass
+    it = iter(person)
+    for _ in range(5):
+        next(it)
+    with pytest.raises(StopIteration):
+        next(it)
 
 
 if __name__ == '__main__':

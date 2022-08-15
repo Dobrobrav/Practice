@@ -1,6 +1,3 @@
-from typing import Union
-
-
 class Person:
     fio: str
     job: str
@@ -18,11 +15,11 @@ class Person:
         self.salary = salary
         self.year_job = year_job
 
-    def __setitem__(self, key: int, value: Union[float, str]):
+    def __setitem__(self, key: int, value: float | str):
         self._check_index(key)
         setattr(self, self._attr_name_by_index[key], value)
 
-    def __getitem__(self, item: int) -> Union[float, str]:
+    def __getitem__(self, item: int) -> float | str:
         self._check_index(item)
         return getattr(self, self._attr_name_by_index[item])
 
