@@ -42,8 +42,8 @@ class SparseTable:
     def _add_to_rows_and_cols(self, row: int, col: int):
         rows = self._cell_quantity_in_rows
         cols = self._cell_quantity_in_cols
-        rows[row] = (rows.get(row) + 1) if rows.get(row) else 1
-        cols[col] = (cols.get(col) + 1) if cols.get(col) else 1
+        rows[row] = (rows.get(row) + 1) if rows.get(row) else 1  # type: ignore
+        cols[col] = (cols.get(col) + 1) if cols.get(col) else 1  # type: ignore
 
     def _remove_from_rows_and_cols(self, row: int, col: int):
         rows = self._cell_quantity_in_rows
