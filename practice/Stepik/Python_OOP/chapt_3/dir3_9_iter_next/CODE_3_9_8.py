@@ -10,8 +10,8 @@ class StackObj:
     def __init__(self, data: str):
         self.data = data
 
-    # def __repr__(self):
-    #     return str(self.data)
+    def __repr__(self):
+        return str(self.data)
 
 
 class Stack:
@@ -49,6 +49,7 @@ class Stack:
             self._change_node_in_long_stack(key, node)
 
     def __getitem__(self, item: int) -> str:
+        self._check_index(item)
         return self._get_node(item).data
 
     def __iter__(self):
@@ -126,9 +127,8 @@ class Stack:
             self._change_middle_node(key, node)
 
     def _get_node(self, key: int):
-        self._check_index(key)
         node = self.top
-        for _ in range(key - 1):
+        for _ in range(key):
             node = node.next
         return node
 
