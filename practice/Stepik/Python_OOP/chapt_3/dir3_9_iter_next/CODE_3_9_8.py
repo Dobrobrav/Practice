@@ -11,7 +11,7 @@ class StackObj:
         self.data = data
 
     def __repr__(self):
-        return str(self.data)
+        return f"obj: {self.data}"
 
 
 class Stack:
@@ -53,10 +53,10 @@ class Stack:
         return self._get_node(item).data
 
     def __iter__(self):
-        obj = self.top
-        while obj:
-            yield obj
-            obj = obj.next
+        node = self.top
+        while node:
+            yield node
+            node = node.next
 
     def __len__(self):
         return self._length
@@ -69,9 +69,9 @@ class Stack:
         self._length += 1
         if not self.top:
             return self._push_back_in_empty_stack(obj)
-        self._push_back_in_filled_stack(obj)
+        self._push_back_in_filled_stack(obj)  # 1+ nodes in stack
 
-    def push_front(self, obj: StackObj):  # need to decompose it!
+    def push_front(self, obj: StackObj):
         """ Add StackObj to the beginning. """
         if not self.top:  # empty stack
             self.top = obj
@@ -85,7 +85,7 @@ class Stack:
 
         self._length -= 1
         if self.top.next is None:  # 1 node in the stack
-            return self._pop_in_one_node_stack()
+            return self._pop_from_one_node_stack()
         return self._pop_in_long_stack()  # 2+ nodes in the stack
 
     def _push_front_in_filled_stack(self, obj: StackObj):
@@ -94,16 +94,16 @@ class Stack:
         self.top = obj
 
     def _push_back_in_empty_stack(self, obj: StackObj):
-        if self.top is None:  # empty stack
+        if not self.top:  # empty stack
             self.top = obj
 
     def _push_back_in_filled_stack(self, obj: StackObj):
         current_node = self.top  # not empty stack
-        while current_node.next is not None:
+        while current_node.next:
             current_node = current_node.next
         current_node.next = obj
 
-    def _pop_in_one_node_stack(self) -> StackObj:
+    def _pop_from_one_node_stack(self) -> StackObj:
         popped_node = self.top
         self.top = None
         return popped_node
@@ -112,7 +112,7 @@ class Stack:
         current_node = self.top
         while current_node.next.next is not None:
             current_node = current_node.next
-        popped_node = current_node.next  # type: ignore
+        popped_node = current_node.next
         current_node.next = None
         return popped_node
 
@@ -126,7 +126,7 @@ class Stack:
         else:  # changing middle node
             self._change_middle_node(key, node)
 
-    def _get_node(self, key: int):
+    def _get_node(self, key: int) -> StackObj:
         node = self.top
         for _ in range(key):
             node = node.next
@@ -137,7 +137,7 @@ class Stack:
         current.next = node
 
     def _change_middle_node(self, key: int, node: StackObj):
-        current = self._get_node(key)
+        current = self._get_node(key - 1)
         next_obj = current.next
         current.next = node
         node.next = next_obj.next
