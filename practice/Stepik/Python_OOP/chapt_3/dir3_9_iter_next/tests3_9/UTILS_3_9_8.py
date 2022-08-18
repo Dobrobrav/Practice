@@ -2,6 +2,34 @@ from practice.Stepik.Python_OOP.chapt_3.dir3_9_iter_next \
     .CODE_3_9_8 import *
 
 
+def get_nodes(stack) -> List[StackObj]:
+    """ Return all nodes of the stack. """
+    if stack.top is None:
+        return []
+
+    objects = [stack.top]
+    current_obj = stack.top
+    while current_obj.next is not None:
+        objects.append(current_obj.next)
+        current_obj = current_obj.next
+    return objects
+
+
+def push_front(stack: Stack, obj: StackObj):
+    """ Add StackObj to the beginning. """
+    if not stack.top:  # empty stack
+        stack.top = obj
+    else:
+        _push_front_in_filled_stack(stack, obj)
+    stack._length += 1
+
+
+def _push_front_in_filled_stack(stack: Stack, obj: StackObj):
+    next_obj = stack.top
+    obj.next = next_obj
+    stack.top = obj
+
+
 def push_back(stack: Stack, obj: StackObj):
     """ Add StackObj to the end. """
     stack._length += 1

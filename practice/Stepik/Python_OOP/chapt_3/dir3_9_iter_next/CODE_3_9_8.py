@@ -155,5 +155,5 @@ class Stack:
         return objects
 
     def _check_index(self, index: int):
-        if type(index) is not int or len(self) <= index:
+        if not (type(index) is int and 0 <= index < len(self)):
             raise IndexError('неверный индекс')

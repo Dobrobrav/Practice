@@ -14,6 +14,12 @@ def stack_obj():
     return stack_obj
 
 
+@pytest.fixture
+def compare_lst():
+    compare_lst = [StackObj(str(i)) for i in range(20)]
+    return compare_lst
+
+
 def get_node(stack: Stack, key: int) -> StackObj:
     node = stack.top
     for _ in range(key):
@@ -88,55 +94,96 @@ def test_stack_imul(stack, stack_obj, flag):
         (4, 10),
         (6, 10),
 ))
-def test_stack_setitem_in_long_stack(stack, stack_obj, index, stack_size):
+def test_stack_setitem_in_stack(stack, stack_obj, index, stack_size):
     for i in range(stack_size):
         push_back(stack, StackObj(str(i)))
     stack[index] = stack_obj.data
     assert get_node(stack, index).data == stack_obj.data
 
 
-def test_stack_setitem_error(stack):
-    pass
+@pytest.mark.parametrize('stack_length, index', (
+        (0, 1),
+        (1, 2),
+        (10, 11),
+        (0, 2),
+        (1, 3),
+        (10, 12),
+        (10, 0.5),
+        (10, 1.2),
+        (10, -5),
+        (10, -3.4),
+))
+def test_stack_setitem_error(stack, stack_obj, stack_length, index):
+    for i in range(stack_length):
+        push_back(stack, StackObj(str(i)))
+    with pytest.raises(IndexError):
+        stack[index] = 'some data'
 
 
-def test_stack_getitem(stack):
-    pass
+@pytest.mark.parametrize('index, stack_size', (
+        (0, 1),
+        (0, 10),
+        (1, 2),
+        (1, 10),
+        (2, 10),
+        (4, 10),
+        (6, 10),
+))
+def test_stack_getitem(stack, stack_obj, index, stack_size):
+    for i in range(stack_size):
+        push_back(stack, StackObj(str(i)))
+    assert get_node(stack, index).data == stack[index]
 
 
-def test_stack_getitem_error(stack):
-    pass
+@pytest.mark.parametrize('stack_length, index', (
+        (0, 1),
+        (1, 2),
+        (10, 11),
+        (0, 2),
+        (1, 3),
+        (10, 12),
+        (10, 0.5),
+        (10, 1.2),
+        (10, -5),
+        (10, -3.4),
+))
+def test_stack_getitem_error(stack, stack_obj, stack_length, index):
+    for i in range(stack_length):
+        push_back(stack, StackObj(str(i)))
+    with pytest.raises(IndexError):
+        _ = stack[index]
 
 
-def test_stack_iter(stack):
-    pass
+def test_stack_iter(stack, compare_lst):
+    for stack_obj in compare_lst:
+        push_back(stack, stack_obj)
+
+    assert compare_lst == list(iter(stack))
 
 
-def test_stack_len(stack):
-    pass
+@pytest.mark.parametrize('length', (x for x in range(50)))
+def test_stack_len(stack, length):
+    stack._length = length
+    assert len(stack) == stack._length
 
 
-def test_stack_push_back(stack):
-    pass
+def test_stack_push_back(stack, compare_lst):
+    for stack_obj in compare_lst:
+        stack.push_back(stack_obj)
+    assert get_nodes(stack) == compare_lst
 
 
-def test_stack_push_front(stack):
-    pass
+def test_stack_push_front(stack, compare_lst):
+    for stack_obj in compare_lst:
+        stack.push_front(stack_obj)
+    assert get_nodes(stack) == compare_lst[::-1]
 
 
-def test_stack_pop(stack):
-    pass
-
-
-def test_stack_(stack):
-    pass
-
-
-def test_stack_():
-    pass
-
-
-def test_stack_():
-    pass
+def test_stack_pop(stack, compare_lst):
+    for stack_obj in compare_lst:
+        stack.push_back(stack_obj)
+    nodes_from_stack = [stack.pop() for _ in range(len(compare_lst))]
+    assert nodes_from_stack == compare_lst[::-1] and get_nodes(stack) == []
 
 
 if __name__ == '__main__':
