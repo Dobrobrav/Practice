@@ -1,6 +1,7 @@
-from typing import Tuple, Any, Dict, Optional
+from typing import Tuple, Any, Dict, Optional, Callable
 from abc import ABC, abstractmethod
 from enum import Enum
+from random import randint
 
 GamePole = Tuple[Tuple['Cell', ...], ...]
 
@@ -50,6 +51,13 @@ class IGameState(ABC):
     def _print_draw():
         print("The game is finished and there's not winner!")
 
+    def _get_valid_coords(self, game_pole: GamePole,
+                          get_coords: Callable) -> Tuple[int, int]:
+        coords = get_coords()
+        while not self._validate_coords(game_pole, coords):
+            coords = get_coords()
+        return coords
+
     @staticmethod
     def _request_coords() -> Tuple[int, int]:
         i, j = input("Type coordinates in the 'i, j' format").split(", ")
@@ -58,17 +66,64 @@ class IGameState(ABC):
 
     @staticmethod
     def _generate_coords() -> Tuple[int, int]:
-        pass
+        coords = (randint(0, 2), randint(0, 2))
+        return coords
 
-    def _validate_coords(self, coords: Tuple[int, int]) -> bool:
-        pass
+    def _validate_coords(self, game_pole: GamePole,
+                         coords: Any) -> bool:
+        if self._validate_coords_type(coords):
+            i, j = coords
+            if game_pole[i][j].is_free:
+                return True
 
-    def _draw_sign(self, game_pole: GamePole,
-                   coords: Tuple[int, int], sign: str):
-        pass
+        return False
 
-    def _define_turn_result(self, game_pole: GamePole) -> GameState:
-        pass
+    @staticmethod
+    def _validate_coords_type(coords: Any) -> bool:
+        return (isinstance(coords, tuple) and len(coords) == 1
+                and all(type(coord) is int for coord in coords))
+
+    @staticmethod
+    def _draw_sign(game_pole: GamePole,
+                   coords: Tuple[int, int], sign: int):
+        i, j = coords
+        game_pole[i][j].value = sign
+
+    def _define_turn_result(self, game_pole: GamePole,
+                            current_state: GameState) -> GameState:
+        is_computer_win = self._has_victory_line(
+            game_pole,
+            TicTacToe.COMPUTER_O
+        )
+        if is_computer_win:
+            return GameState.COMPUTER_WIN
+        is_human_win = self._has_victory_line(
+            game_pole,
+            TicTacToe.HUMAN_X
+        )
+        if is_human_win:
+            return GameState.HUMAN_WIN
+        has_free_cells = all(game_pole[i][j].value != TicTacToe.FREE_CELL
+                             for i in range(TicTacToe.POLE_SIZE)
+                             for j in range(TicTacToe.POLE_SIZE))
+        if has_free_cells and current_state is GameState.COMPUTER_TURN:
+            return GameState.HUMAN_TURN
+        if has_free_cells and current_state is GameState.HUMAN_TURN:
+            return GameState.COMPUTER_TURN
+        if not has_free_cells:
+            return GameState.DRAW
+        raise RuntimeError
+
+    @staticmethod
+    def _has_victory_line(game_pole: GamePole, sign: int) -> bool:
+        hor_lines = any(all(e == sign for e in row)
+                        for row in game_pole)
+        vert_lines = any(all(e == sign for e in row)
+                         for row in zip(*game_pole))
+        diagonals = all(game_pole[i][j].value == sign
+                        for i in range(TicTacToe.POLE_SIZE)
+                        for j in range(TicTacToe.POLE_SIZE))
+        return hor_lines or vert_lines or diagonals
 
 
 class NotStarted(IGameState):
@@ -85,17 +140,13 @@ class NotStarted(IGameState):
         return False
 
     def human_go(self, game_pole: GamePole) -> GameState.COMPUTER_TURN:
-        coords = self._request_coords()
-        while not self._validate_coords(coords):
-            coords = self._request_coords()
-        self._draw_sign(game_pole, coords, 'X')
+        coords = self._get_valid_coords(game_pole, self._request_coords)
+        self._draw_sign(game_pole, coords, TicTacToe.HUMAN_X)
         return GameState.COMPUTER_TURN
 
     def computer_go(self, game_pole: GamePole) -> GameState.HUMAN_TURN:
-        coords = self._generate_coords()
-        while not self._validate_coords(coords):
-            coords = self._generate_coords()
-        self._draw_sign(game_pole, coords, 'O')
+        coords = self._get_valid_coords(game_pole, self._generate_coords)
+        self._draw_sign(game_pole, coords, TicTacToe.COMPUTER_O)
         return GameState.HUMAN_TURN
 
 
@@ -116,8 +167,8 @@ class ComputerTurn(IGameState):
         print("It's computer's turn now!")
 
     def computer_go(self, game_pole: GamePole) -> GameState:
-        self._draw_sign(game_pole, 'O')
-        return self._define_turn_result(game_pole)
+        self._get_valid_coords(game_pole, self._generate_coords)
+        return self._define_turn_result(game_pole, GameState.COMPUTER_TURN)
 
 
 class HumanTurn(IGameState):
@@ -134,8 +185,9 @@ class HumanTurn(IGameState):
         return False
 
     def human_go(self, game_pole: GamePole) -> GameState:
-        self._draw_sign(game_pole, 'X')
-        return self._define_turn_result(game_pole)
+        coords = self._get_valid_coords(game_pole, self._request_coords)
+        self._draw_sign(game_pole, coords, TicTacToe.HUMAN_X)
+        return self._define_turn_result(game_pole, GameState.HUMAN_TURN)
 
     def computer_go(self, game_pole: GamePole):
         print("It's human's turn now!")
