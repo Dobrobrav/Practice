@@ -1,4 +1,4 @@
-from typing import Tuple, Any, Dict, Optional, Callable
+from typing import Tuple, Any, Dict, Callable, Literal
 from abc import ABC, abstractmethod
 from enum import Enum
 from random import randint
@@ -18,6 +18,11 @@ class GameState(Enum):
 class IGameState(ABC):
     @property
     @abstractmethod
+    def state_enum(self) -> GameState:
+        ...
+
+    @property
+    @abstractmethod
     def is_human_win(self) -> bool:
         ...
 
@@ -32,11 +37,11 @@ class IGameState(ABC):
         ...
 
     @abstractmethod
-    def human_go(self, game_pole: GamePole) -> Optional[GameState]:
+    def human_go(self, game_pole: GamePole) -> GameState:
         ...
 
     @abstractmethod
-    def computer_go(self, game_pole: GamePole) -> Optional[GameState]:
+    def computer_go(self, game_pole: GamePole) -> GameState:
         ...
 
     @staticmethod
@@ -49,7 +54,7 @@ class IGameState(ABC):
 
     @staticmethod
     def _print_draw():
-        print("The game is finished and there's not winner!")
+        print("The game is finished and there's no winner!")
 
     def _get_valid_coords(self, game_pole: GamePole,
                           get_coords: Callable) -> Tuple[int, int]:
@@ -60,7 +65,7 @@ class IGameState(ABC):
 
     @staticmethod
     def _request_coords() -> Tuple[int, int]:
-        i, j = input("Type coordinates in the 'i, j' format").split(", ")
+        i, j = input("Type coordinates in the 'i j' format ").split(", ")
         coords = (int(i), int(j))
         return coords
 
@@ -73,14 +78,14 @@ class IGameState(ABC):
                          coords: Any) -> bool:
         if self._validate_coords_type(coords):
             i, j = coords
-            if game_pole[i][j].is_free:
+            if game_pole[i][j]:
                 return True
 
         return False
 
     @staticmethod
     def _validate_coords_type(coords: Any) -> bool:
-        return (isinstance(coords, tuple) and len(coords) == 1
+        return (isinstance(coords, tuple) and len(coords) == 2
                 and all(type(coord) is int for coord in coords))
 
     @staticmethod
@@ -89,21 +94,21 @@ class IGameState(ABC):
         i, j = coords
         game_pole[i][j].value = sign
 
-    def _define_turn_result(self, game_pole: GamePole,
-                            current_state: GameState) -> GameState:
+    def define_turn_result(self, game_pole: GamePole,
+                           current_state: GameState) -> GameState:
         is_computer_win = self._has_victory_line(
             game_pole,
-            TicTacToe.COMPUTER_O
+            TicTacToe.COMPUTER_O,
         )
         if is_computer_win:
             return GameState.COMPUTER_WIN
         is_human_win = self._has_victory_line(
             game_pole,
-            TicTacToe.HUMAN_X
+            TicTacToe.HUMAN_X,
         )
         if is_human_win:
             return GameState.HUMAN_WIN
-        has_free_cells = all(game_pole[i][j].value != TicTacToe.FREE_CELL
+        has_free_cells = any(game_pole[i][j].value == TicTacToe.FREE_CELL
                              for i in range(TicTacToe.POLE_SIZE)
                              for j in range(TicTacToe.POLE_SIZE))
         if has_free_cells and current_state is GameState.COMPUTER_TURN:
@@ -116,35 +121,41 @@ class IGameState(ABC):
 
     @staticmethod
     def _has_victory_line(game_pole: GamePole, sign: int) -> bool:
-        hor_lines = any(all(e == sign for e in row)
+        hor_lines = any(all(cell.value == sign for cell in row)
                         for row in game_pole)
-        vert_lines = any(all(e == sign for e in row)
+        vert_lines = any(all(cell.value == sign for cell in row)
                          for row in zip(*game_pole))
-        diagonals = all(game_pole[i][j].value == sign
-                        for i in range(TicTacToe.POLE_SIZE)
-                        for j in range(TicTacToe.POLE_SIZE))
-        return hor_lines or vert_lines or diagonals
+        main_diagonal = all(game_pole[coord][coord].value == sign
+                            for coord in range(TicTacToe.POLE_SIZE - 1, -1, -1))
+        sub_diagonal = all(game_pole[i][j].value == sign
+                           for i, j in zip(range(TicTacToe.POLE_SIZE),
+                                           range(TicTacToe.POLE_SIZE - 1, -1, -1)))
+        return hor_lines or vert_lines or main_diagonal or sub_diagonal
 
 
 class NotStarted(IGameState):
     @property
-    def is_human_win(self) -> False:
+    def state_enum(self) -> Literal[GameState.NOT_STARTED]:
+        return GameState.NOT_STARTED
+
+    @property
+    def is_human_win(self) -> Literal[False]:
         return False
 
     @property
-    def is_computer_win(self) -> False:
+    def is_computer_win(self) -> Literal[False]:
         return False
 
     @property
-    def is_draw(self) -> False:
+    def is_draw(self) -> Literal[False]:
         return False
 
-    def human_go(self, game_pole: GamePole) -> GameState.COMPUTER_TURN:
+    def human_go(self, game_pole: GamePole) -> Literal[GameState.COMPUTER_TURN]:
         coords = self._get_valid_coords(game_pole, self._request_coords)
         self._draw_sign(game_pole, coords, TicTacToe.HUMAN_X)
         return GameState.COMPUTER_TURN
 
-    def computer_go(self, game_pole: GamePole) -> GameState.HUMAN_TURN:
+    def computer_go(self, game_pole: GamePole) -> Literal[GameState.HUMAN_TURN]:
         coords = self._get_valid_coords(game_pole, self._generate_coords)
         self._draw_sign(game_pole, coords, TicTacToe.COMPUTER_O)
         return GameState.HUMAN_TURN
@@ -152,58 +163,74 @@ class NotStarted(IGameState):
 
 class ComputerTurn(IGameState):
     @property
-    def is_human_win(self) -> False:
+    def state_enum(self) -> Literal[GameState.COMPUTER_TURN]:
+        return GameState.COMPUTER_TURN
+
+    @property
+    def is_human_win(self) -> Literal[False]:
         return False
 
     @property
-    def is_computer_win(self) -> False:
+    def is_computer_win(self) -> Literal[False]:
         return False
 
     @property
-    def is_draw(self) -> False:
+    def is_draw(self) -> Literal[False]:
         return False
 
     def human_go(self, game_pole: GamePole):
         print("It's computer's turn now!")
 
     def computer_go(self, game_pole: GamePole) -> GameState:
-        self._get_valid_coords(game_pole, self._generate_coords)
-        return self._define_turn_result(game_pole, GameState.COMPUTER_TURN)
+        coords = self._get_valid_coords(game_pole, self._generate_coords)
+        self._draw_sign(game_pole, coords, TicTacToe.COMPUTER_O)
+        return self.define_turn_result(game_pole, GameState.COMPUTER_TURN)
 
 
 class HumanTurn(IGameState):
     @property
-    def is_human_win(self) -> False:
+    def state_enum(self) -> Literal[GameState.HUMAN_TURN]:
+        return GameState.HUMAN_TURN
+
+    @property
+    def is_human_win(self) -> Literal[False]:
         return False
 
     @property
-    def is_computer_win(self) -> False:
+    def is_computer_win(self) -> Literal[False]:
         return False
 
     @property
-    def is_draw(self) -> False:
+    def is_draw(self) -> Literal[False]:
         return False
 
     def human_go(self, game_pole: GamePole) -> GameState:
         coords = self._get_valid_coords(game_pole, self._request_coords)
         self._draw_sign(game_pole, coords, TicTacToe.HUMAN_X)
-        return self._define_turn_result(game_pole, GameState.HUMAN_TURN)
+        return self.define_turn_result(game_pole, GameState.HUMAN_TURN)
 
     def computer_go(self, game_pole: GamePole):
         print("It's human's turn now!")
 
 
 class HumanWin(IGameState):
-    @property
-    def is_human_win(self) -> True:
-        return True
-
-    @property
-    def is_computer_win(self) -> False:
+    def __bool__(self) -> Literal[False]:
         return False
 
     @property
-    def is_draw(self) -> False:
+    def state_enum(self) -> Literal[GameState.HUMAN_WIN]:
+        return GameState.HUMAN_WIN
+
+    @property
+    def is_human_win(self) -> Literal[True]:
+        return True
+
+    @property
+    def is_computer_win(self) -> Literal[False]:
+        return False
+
+    @property
+    def is_draw(self) -> Literal[False]:
         return False
 
     def human_go(self, game_pole: GamePole):
@@ -214,16 +241,23 @@ class HumanWin(IGameState):
 
 
 class ComputerWin(IGameState):
-    @property
-    def is_human_win(self) -> False:
+    def __bool__(self) -> Literal[False]:
         return False
 
     @property
-    def is_computer_win(self) -> True:
+    def state_enum(self) -> Literal[GameState.COMPUTER_WIN]:
+        return GameState.COMPUTER_WIN
+
+    @property
+    def is_human_win(self) -> Literal[False]:
+        return False
+
+    @property
+    def is_computer_win(self) -> Literal[True]:
         return True
 
     @property
-    def is_draw(self) -> False:
+    def is_draw(self) -> Literal[False]:
         return False
 
     def human_go(self, game_pole: GamePole):
@@ -234,16 +268,23 @@ class ComputerWin(IGameState):
 
 
 class Draw(IGameState):
-    @property
-    def is_human_win(self) -> False:
+    def __bool__(self) -> Literal[False]:
         return False
 
     @property
-    def is_computer_win(self) -> False:
+    def state_enum(self) -> Literal[GameState.DRAW]:
+        return GameState.DRAW
+
+    @property
+    def is_human_win(self) -> Literal[False]:
         return False
 
     @property
-    def is_draw(self) -> True:
+    def is_computer_win(self) -> Literal[False]:
+        return False
+
+    @property
+    def is_draw(self) -> Literal[True]:
         return True
 
     def human_go(self, game_pole: GamePole):
@@ -254,17 +295,16 @@ class Draw(IGameState):
 
 
 class Cell:
-    is_free = True
     value = 0
 
     def __bool__(self) -> bool:
-        return self.is_free
+        """ Return True if cell is free (value == 0)"""
+        return not bool(self.value)
 
     def __repr__(self):
         return f"cell: {self.value}"
 
     def reset(self):
-        self.is_free = True
         self.value = 0
 
 
@@ -275,10 +315,11 @@ class TicTacToe:
 
     POLE_SIZE = 3
     _states: Dict[GameState, IGameState]
-    _state = NotStarted()
+    _state: IGameState = NotStarted()
     pole: Tuple[Tuple[Cell, ...], ...]
 
     def __init__(self):
+        self.init()
         self._states = {
             GameState.NOT_STARTED: NotStarted(),
             GameState.COMPUTER_TURN: ComputerTurn(),
@@ -292,7 +333,11 @@ class TicTacToe:
         self._check_index(key)
         self._check_if_cell_is_free(key)
         self.pole[key[0]][key[1]].value = value
-        self.pole[key[0]][key[1]].is_free = False
+        new_state = self._state.define_turn_result(self.pole,
+                                                   GameState.HUMAN_TURN)
+        if new_state is not None:
+            self.state = new_state  # type: ignore
+        self.show()
 
     def __getitem__(self, item: tuple) -> Tuple[int, ...]:
         """ Return item or tuple of items, depending on input index. """
@@ -306,13 +351,13 @@ class TicTacToe:
         return self.pole[x][y].value
 
     def __bool__(self):
-        pass
+        return bool(self.state)
 
     def __repr__(self):
         return '\n'.join(
-            ' '.join(' | ' if cell.value == self.FREE_CELL
-                     else 'O' if cell.value == self.COMPUTER_O else 'X'
-                     for cell in row)
+            ' | '.join(' ' if cell.value == self.FREE_CELL
+                       else 'O' if cell.value == self.COMPUTER_O else 'X'
+                       for cell in row)
             for row in self.pole
         )
 
@@ -339,6 +384,7 @@ class TicTacToe:
     def init(self):
         if hasattr(self, 'pole'):
             self._clear()
+            self.state = GameState.NOT_STARTED
         else:
             self.pole = tuple(
                 tuple(Cell() for _ in range(self.POLE_SIZE))
@@ -347,21 +393,22 @@ class TicTacToe:
 
     def human_go(self):
         # need to wrap it with smt more beautiful and readable
-        # like the consept that the state methods return the new state
-        new_state = self._states.get(self._state.human_go(self.pole))
-        if new_state:
-            self._state = new_state
-        # i, j = input('Введите координаты клетки в формате "i j"').split()
+        new_state = self._state.human_go(self.pole)
+        if new_state is not None:
+            self.state = new_state
+        self.show()
 
     def computer_go(self):
-        new_state = self._states.get(self._state.computer_go(self.pole))
-        if new_state:
-            self._state = new_state
+        new_state = self._state.computer_go(self.pole)
+        if new_state is not None:
+            self.state = new_state
+
+        self.show()
 
     def show(self):
         for row in self.pole:
-            print(' '.join(
-                ' | ' if cell.value == self.FREE_CELL
+            print(' | '.join(
+                ' ' if cell.value == self.FREE_CELL
                 else 'O' if cell.value == self.COMPUTER_O else 'X'
                 for cell in row
             ))
@@ -405,4 +452,22 @@ class TicTacToe:
 if __name__ == '__main__':
     game = TicTacToe()
     game.init()
+    step_game = 0
+    while game:
+        game.show()
+
+        if step_game % 2 == 0:
+            game.human_go()
+        else:
+            game.computer_go()
+
+        step_game += 1
+
     game.show()
+
+    if game.is_human_win:
+        print("Поздравляем! Вы победили!")
+    elif game.is_computer_win:
+        print("Все получится, со временем")
+    else:
+        print("Ничья.")
