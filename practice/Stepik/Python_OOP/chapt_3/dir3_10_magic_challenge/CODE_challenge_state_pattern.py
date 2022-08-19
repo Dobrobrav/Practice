@@ -1,6 +1,8 @@
-from typing import Tuple, Any, Dict
+from typing import Tuple, Any, Dict, Optional
 from abc import ABC, abstractmethod
 from enum import Enum
+
+GamePole = Tuple[Tuple['Cell', ...], ...]
 
 
 class GameState(Enum):
@@ -29,12 +31,44 @@ class IGameState(ABC):
         ...
 
     @abstractmethod
-    def human_go(self, game: 'TicTacToe'):
+    def human_go(self, game_pole: GamePole) -> Optional[GameState]:
         ...
 
     @abstractmethod
-    def computer_go(self, game: 'TicTacToe'):
+    def computer_go(self, game_pole: GamePole) -> Optional[GameState]:
         ...
+
+    @staticmethod
+    def _print_computer_won():
+        print("The game is finished and computer won!")
+
+    @staticmethod
+    def _print_human_won():
+        print("The game is finished and human won!")
+
+    @staticmethod
+    def _print_draw():
+        print("The game is finished and there's not winner!")
+
+    @staticmethod
+    def _request_coords() -> Tuple[int, int]:
+        i, j = input("Type coordinates in the 'i, j' format").split(", ")
+        coords = (int(i), int(j))
+        return coords
+
+    @staticmethod
+    def _generate_coords() -> Tuple[int, int]:
+        pass
+
+    def _validate_coords(self, coords: Tuple[int, int]) -> bool:
+        pass
+
+    def _draw_sign(self, game_pole: GamePole,
+                   coords: Tuple[int, int], sign: str):
+        pass
+
+    def _define_turn_result(self, game_pole: GamePole) -> GameState:
+        pass
 
 
 class NotStarted(IGameState):
@@ -50,15 +84,19 @@ class NotStarted(IGameState):
     def is_draw(self) -> False:
         return False
 
-    def human_go(self, game: 'TicTacToe'):
-        self.make_human_move(game)
-        winner = self._get_winner(game)
-        # it's bucking complicated. Need to consider all the options
-        # if winner
-        # game.state
+    def human_go(self, game_pole: GamePole) -> GameState.COMPUTER_TURN:
+        coords = self._request_coords()
+        while not self._validate_coords(coords):
+            coords = self._request_coords()
+        self._draw_sign(game_pole, coords, 'X')
+        return GameState.COMPUTER_TURN
 
-    def computer_go(self, game: 'TicTacToe'):
-        pass
+    def computer_go(self, game_pole: GamePole) -> GameState.HUMAN_TURN:
+        coords = self._generate_coords()
+        while not self._validate_coords(coords):
+            coords = self._generate_coords()
+        self._draw_sign(game_pole, coords, 'O')
+        return GameState.HUMAN_TURN
 
 
 class ComputerTurn(IGameState):
@@ -74,11 +112,12 @@ class ComputerTurn(IGameState):
     def is_draw(self) -> False:
         return False
 
-    def human_go(self, game: 'TicTacToe'):
-        pass
+    def human_go(self, game_pole: GamePole):
+        print("It's computer's turn now!")
 
-    def computer_go(self, game: 'TicTacToe'):
-        pass
+    def computer_go(self, game_pole: GamePole) -> GameState:
+        self._draw_sign(game_pole, 'O')
+        return self._define_turn_result(game_pole)
 
 
 class HumanTurn(IGameState):
@@ -94,11 +133,12 @@ class HumanTurn(IGameState):
     def is_draw(self) -> False:
         return False
 
-    def human_go(self, game: 'TicTacToe'):
-        pass
+    def human_go(self, game_pole: GamePole) -> GameState:
+        self._draw_sign(game_pole, 'X')
+        return self._define_turn_result(game_pole)
 
-    def computer_go(self, game: 'TicTacToe'):
-        pass
+    def computer_go(self, game_pole: GamePole):
+        print("It's human's turn now!")
 
 
 class HumanWin(IGameState):
@@ -114,11 +154,11 @@ class HumanWin(IGameState):
     def is_draw(self) -> False:
         return False
 
-    def human_go(self, game: 'TicTacToe'):
-        pass
+    def human_go(self, game_pole: GamePole):
+        self._print_human_won()
 
-    def computer_go(self, game: 'TicTacToe'):
-        pass
+    def computer_go(self, game_pole: GamePole):
+        self._print_human_won()
 
 
 class ComputerWin(IGameState):
@@ -134,11 +174,11 @@ class ComputerWin(IGameState):
     def is_draw(self) -> False:
         return False
 
-    def human_go(self, game: 'TicTacToe'):
-        pass
+    def human_go(self, game_pole: GamePole):
+        self._print_computer_won()
 
-    def computer_go(self, game: 'TicTacToe'):
-        pass
+    def computer_go(self, game_pole: GamePole):
+        self._print_computer_won()
 
 
 class Draw(IGameState):
@@ -154,11 +194,11 @@ class Draw(IGameState):
     def is_draw(self) -> True:
         return True
 
-    def human_go(self, game: 'TicTacToe'):
-        pass
+    def human_go(self, game_pole: GamePole):
+        self._print_draw()
 
-    def computer_go(self, game: 'TicTacToe'):
-        pass
+    def computer_go(self, game_pole: GamePole):
+        self._print_draw()
 
 
 class Cell:
@@ -177,11 +217,6 @@ class Cell:
 
 
 class TicTacToe:
-    """ Tic-tac-toe game field.
-    Allows access to fields by [i, j] index,
-    also supports [:, j] and [i, :] indexes for GETTING item.
-    """
-
     FREE_CELL = 0
     HUMAN_X = 1
     COMPUTER_O = 2
@@ -259,11 +294,17 @@ class TicTacToe:
             )
 
     def human_go(self):
-        self._state.human_go(self)
+        # need to wrap it with smt more beautiful and readable
+        # like the consept that the state methods return the new state
+        new_state = self._states.get(self._state.human_go(self.pole))
+        if new_state:
+            self._state = new_state
         # i, j = input('Введите координаты клетки в формате "i j"').split()
 
     def computer_go(self):
-        self._state.computer_go(self)
+        new_state = self._states.get(self._state.computer_go(self.pole))
+        if new_state:
+            self._state = new_state
 
     def show(self):
         for row in self.pole:
@@ -272,6 +313,9 @@ class TicTacToe:
                 else 'O' if cell.value == self.COMPUTER_O else 'X'
                 for cell in row
             ))
+
+    def _get_winner(self) -> GameState:
+        pass
 
     def _clear(self):
         for i in range(3):
