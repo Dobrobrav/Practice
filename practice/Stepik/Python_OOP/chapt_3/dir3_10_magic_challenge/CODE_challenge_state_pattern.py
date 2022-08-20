@@ -49,18 +49,15 @@ class IGameState(ABC):
 
     @staticmethod
     def _print_computer_won():
-        pass
-        # print("The game is finished and computer won!")
+        print("The game is finished and computer won!")
 
     @staticmethod
     def _print_human_won():
-        pass
-        # print("The game is finished and human won!")
+        print("The game is finished and human won!")
 
     @staticmethod
     def _print_draw():
-        pass
-        # print("The game is finished and there's no winner!")
+        print("The game is finished and there's no winner!")
 
     def _get_valid_coords(self, game_pole: GamePole,
                           get_coords: Callable) -> tuple[int, int]:
@@ -258,7 +255,6 @@ class HumanWin(IGameState):
 class ComputerWin(IGameState):
     def __bool__(self) -> Literal[False]:
         return False
-
     @property
     def state_enum(self) -> Literal[GameState.COMPUTER_WIN]:
         return GameState.COMPUTER_WIN
