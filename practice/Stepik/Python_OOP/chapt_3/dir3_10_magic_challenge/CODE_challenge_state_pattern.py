@@ -1,9 +1,9 @@
-from typing import Tuple, Any, Dict, Callable, Literal
+from typing import Any, Callable, Literal, TypeAlias
 from abc import ABC, abstractmethod
 from enum import Enum
 from random import randint
 
-GamePole = Tuple[Tuple['Cell', ...], ...]
+GamePole: TypeAlias = tuple[tuple['Cell', ...], ...]
 
 
 class GameState(Enum):
@@ -63,13 +63,13 @@ class IGameState(ABC):
         # print("The game is finished and there's no winner!")
 
     def _get_valid_coords(self, game_pole: GamePole,
-                          get_coords: Callable) -> Tuple[int, int]:
+                          get_coords: Callable) -> tuple[int, int]:
         coords = get_coords()
         while not self._validate_coords(game_pole, coords):
             coords = get_coords()
         return coords
 
-    def _request_coords(self) -> Tuple[int, int]:
+    def _request_coords(self) -> tuple[int, int]:
         separator = " "
         try:
             i, j = input(f"Type coordinates in the 'i{separator}j' format ") \
@@ -79,7 +79,7 @@ class IGameState(ABC):
             return self._request_coords()
 
     @staticmethod
-    def _generate_coords() -> Tuple[int, int]:
+    def _generate_coords() -> tuple[int, int]:
         coords = (randint(0, 2), randint(0, 2))
         return coords
 
@@ -92,7 +92,7 @@ class IGameState(ABC):
 
         return False
 
-    def _validate_coords_range(self, coords: Tuple[int, int]) -> bool:
+    def _validate_coords_range(self, coords: tuple[int, int]) -> bool:
         return all(0 <= coord <= self.game.POLE_SIZE for coord in coords)
 
     @staticmethod
@@ -102,7 +102,7 @@ class IGameState(ABC):
 
     @staticmethod
     def _draw_sign(game_pole: GamePole,
-                   coords: Tuple[int, int], sign: int):
+                   coords: tuple[int, int], sign: int):
         i, j = coords
         game_pole[i][j].value = sign
 
@@ -329,9 +329,9 @@ class TicTacToe:
     COMPUTER_O = 2
 
     POLE_SIZE = 3
-    _states: Dict[GameState, IGameState]
+    _states: dict[GameState, IGameState]
     _state: IGameState
-    pole: Tuple[Tuple[Cell, ...], ...]
+    pole: tuple[tuple[Cell, ...], ...]
 
     def __init__(self):
         self.init()
@@ -345,7 +345,7 @@ class TicTacToe:
         }
         self.state = GameState.NOT_STARTED
 
-    def __setitem__(self, key: Tuple[int, int], value: int):
+    def __setitem__(self, key: tuple[int, int], value: int):
         self._check_index(key)
         self._check_if_cell_is_free(key)
         self.pole[key[0]][key[1]].value = value
@@ -355,16 +355,11 @@ class TicTacToe:
             self.state = new_state  # type: ignore
         self.show()
 
-    def __getitem__(self, item: tuple) -> Tuple[int, ...]:
+    def __getitem__(self, item: tuple) -> tuple[int, ...]:
         """ Return item or tuple of items, depending on input index. """
         self._check_index(item)
-        x, y = item
-        if isinstance(x, slice):
-            return self._get_column(item[1])
-        elif isinstance(y, slice):
-            return self._get_row(item[0])
-
-        return self.pole[x][y].value
+        i, j = item
+        return self.pole[i][j].value
 
     def __bool__(self):
         return bool(self.state)
@@ -437,10 +432,10 @@ class TicTacToe:
             for j in range(3):
                 self.pole[i][j].reset()
 
-    def _get_row(self, row_index) -> Tuple[int, ...]:
+    def _get_row(self, row_index) -> tuple[int, ...]:
         return tuple(cell.value for cell in self.pole[row_index])
 
-    def _get_column(self, column_index: int) -> Tuple[int, ...]:
+    def _get_column(self, column_index: int) -> tuple[int, ...]:
         return tuple(row[column_index].value for row in self.pole)
 
     @classmethod
@@ -449,18 +444,13 @@ class TicTacToe:
             raise IndexError('неверный индекс клетки')
 
         if all(type(e) is int for e in index):
-            cls._check_single_elem_index(index)  # type: ignore
+            if not all(0 <= e <= cls.POLE_SIZE - 1
+                       for e in index):
+                raise IndexError('неверный индекс клетки')  # type: ignore
         else:
             raise IndexError('неверный индекс клетки')
 
-    @classmethod
-    # no need in this method!!
-    def _check_single_elem_index(cls, single_index: Tuple[int, int]):
-        if not all(0 <= e <= cls.POLE_SIZE - 1
-                   for e in single_index):
-            raise IndexError('неверный индекс клетки')
-
-    def _check_if_cell_is_free(self, index: Tuple[int, int]):
+    def _check_if_cell_is_free(self, index: tuple[int, int]):
         if not self.pole[index[0]][index[1]]:
             raise ValueError('клетка уже занята')
 
