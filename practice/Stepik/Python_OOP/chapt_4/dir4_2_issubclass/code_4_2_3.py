@@ -11,7 +11,7 @@ class ListInteger(list):
         self._validate_type(value)
         super().__setitem__(key, value)
 
-    def append(self, __object: int) -> None:
+    def append(self, __object: int):
         self._validate_type(__object)
         super().append(__object)
 
