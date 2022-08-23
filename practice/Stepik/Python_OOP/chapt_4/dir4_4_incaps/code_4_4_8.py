@@ -60,6 +60,7 @@ class PassengerAircraft(Aircraft):
     @chairs.setter
     def chairs(self, chairs: int):
         self._validate_type(chairs, type_=int)
+        self._chairs = chairs
 
 
 class WarPlane(Aircraft):
