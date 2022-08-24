@@ -6,7 +6,7 @@ from random import randint
 GamePole: TypeAlias = tuple[tuple['Cell', ...], ...]
 
 
-class GameState(Enum):
+class GameStateEnum(Enum):
     NOT_STARTED = 0
     COMPUTER_TURN = 1
     HUMAN_TURN = 2
@@ -15,13 +15,13 @@ class GameState(Enum):
     DRAW = 5
 
 
-class IGameState(ABC):
+class GameState(ABC):
     def __init__(self, game: 'TicTacToe'):
         self.game = game
 
     @property
     @abstractmethod
-    def state_enum(self) -> GameState:
+    def state_enum(self) -> GameStateEnum:
         ...
 
     @property
@@ -40,11 +40,11 @@ class IGameState(ABC):
         ...
 
     @abstractmethod
-    def human_go(self, game_pole: GamePole) -> GameState:
+    def human_go(self, game_pole: GamePole) -> GameStateEnum:
         ...
 
     @abstractmethod
-    def computer_go(self, game_pole: GamePole) -> GameState:
+    def computer_go(self, game_pole: GamePole) -> GameStateEnum:
         ...
 
     @staticmethod
@@ -67,10 +67,10 @@ class IGameState(ABC):
         return coords
 
     def _request_coords(self) -> tuple[int, int]:
-        separator = " "
+        separator = ", "
         try:
             i, j = input(f"Type coordinates in the 'i{separator}j' format ") \
-                .split(" ")
+                .split(separator)
             return int(i), int(j)
         except ValueError:
             return self._request_coords()
@@ -103,29 +103,39 @@ class IGameState(ABC):
         i, j = coords
         game_pole[i][j].value = sign
 
+    @staticmethod
+    def show(game_pole: GamePole):
+        # TODO: wrong design. Need to pass game to state to use game methods
+        for row in game_pole:
+            print(' | '.join(
+                ' ' if cell.value == TicTacToe.FREE_CELL
+                else 'O' if cell.value == TicTacToe.COMPUTER_O else 'X'
+                for cell in row
+            ))
+
     def define_turn_result(self, game_pole: GamePole,
-                           current_state: GameState) -> GameState:
+                           current_state: GameStateEnum) -> GameStateEnum:
         is_computer_win = self._has_victory_line(
             game_pole,
             self.game.COMPUTER_O,
         )
         if is_computer_win:
-            return GameState.COMPUTER_WIN
+            return GameStateEnum.COMPUTER_WIN
         is_human_win = self._has_victory_line(
             game_pole,
             self.game.HUMAN_X,
         )
         if is_human_win:
-            return GameState.HUMAN_WIN
+            return GameStateEnum.HUMAN_WIN
         has_free_cells = any(game_pole[i][j].value == self.game.FREE_CELL
                              for i in range(self.game.POLE_SIZE)
                              for j in range(self.game.POLE_SIZE))
-        if has_free_cells and current_state is GameState.COMPUTER_TURN:
-            return GameState.HUMAN_TURN
-        if has_free_cells and current_state is GameState.HUMAN_TURN:
-            return GameState.COMPUTER_TURN
+        if has_free_cells and current_state is GameStateEnum.COMPUTER_TURN:
+            return GameStateEnum.HUMAN_TURN
+        if has_free_cells and current_state is GameStateEnum.HUMAN_TURN:
+            return GameStateEnum.COMPUTER_TURN
         if not has_free_cells:
-            return GameState.DRAW
+            return GameStateEnum.DRAW
         raise RuntimeError
 
     def _has_victory_line(self, game_pole: GamePole, sign: int) -> bool:
@@ -145,10 +155,10 @@ class IGameState(ABC):
         return hor_lines or vert_lines or main_diagonal or sub_diagonal
 
 
-class NotStarted(IGameState):
+class NotStarted(GameState):
     @property
-    def state_enum(self) -> Literal[GameState.NOT_STARTED]:
-        return GameState.NOT_STARTED
+    def state_enum(self) -> Literal[GameStateEnum.NOT_STARTED]:
+        return GameStateEnum.NOT_STARTED
 
     @property
     def is_human_win(self) -> Literal[False]:
@@ -162,21 +172,22 @@ class NotStarted(IGameState):
     def is_draw(self) -> Literal[False]:
         return False
 
-    def human_go(self, game_pole: GamePole) -> Literal[GameState.COMPUTER_TURN]:
+    def human_go(self, game_pole: GamePole) -> Literal[GameStateEnum.COMPUTER_TURN]:
+        self.show(game_pole)
         coords = self._get_valid_coords(game_pole, self._request_coords)
         self._draw_sign(game_pole, coords, self.game.HUMAN_X)
-        return GameState.COMPUTER_TURN
+        return GameStateEnum.COMPUTER_TURN
 
-    def computer_go(self, game_pole: GamePole) -> Literal[GameState.HUMAN_TURN]:
+    def computer_go(self, game_pole: GamePole) -> Literal[GameStateEnum.HUMAN_TURN]:
         coords = self._get_valid_coords(game_pole, self._generate_coords)
         self._draw_sign(game_pole, coords, self.game.COMPUTER_O)
-        return GameState.HUMAN_TURN
+        return GameStateEnum.HUMAN_TURN
 
 
-class ComputerTurn(IGameState):
+class ComputerTurn(GameState):
     @property
-    def state_enum(self) -> Literal[GameState.COMPUTER_TURN]:
-        return GameState.COMPUTER_TURN
+    def state_enum(self) -> Literal[GameStateEnum.COMPUTER_TURN]:
+        return GameStateEnum.COMPUTER_TURN
 
     @property
     def is_human_win(self) -> Literal[False]:
@@ -193,16 +204,16 @@ class ComputerTurn(IGameState):
     def human_go(self, game_pole: GamePole):
         print("It's computer's turn now!")
 
-    def computer_go(self, game_pole: GamePole) -> GameState:
+    def computer_go(self, game_pole: GamePole) -> GameStateEnum:
         coords = self._get_valid_coords(game_pole, self._generate_coords)
         self._draw_sign(game_pole, coords, self.game.COMPUTER_O)
-        return self.define_turn_result(game_pole, GameState.COMPUTER_TURN)
+        return self.define_turn_result(game_pole, GameStateEnum.COMPUTER_TURN)
 
 
-class HumanTurn(IGameState):
+class HumanTurn(GameState):
     @property
-    def state_enum(self) -> Literal[GameState.HUMAN_TURN]:
-        return GameState.HUMAN_TURN
+    def state_enum(self) -> Literal[GameStateEnum.HUMAN_TURN]:
+        return GameStateEnum.HUMAN_TURN
 
     @property
     def is_human_win(self) -> Literal[False]:
@@ -216,22 +227,22 @@ class HumanTurn(IGameState):
     def is_draw(self) -> Literal[False]:
         return False
 
-    def human_go(self, game_pole: GamePole) -> GameState:
+    def human_go(self, game_pole: GamePole) -> GameStateEnum:
         coords = self._get_valid_coords(game_pole, self._request_coords)
         self._draw_sign(game_pole, coords, self.game.HUMAN_X)
-        return self.define_turn_result(game_pole, GameState.HUMAN_TURN)
+        return self.define_turn_result(game_pole, GameStateEnum.HUMAN_TURN)
 
     def computer_go(self, game_pole: GamePole):
         print("It's human's turn now!")
 
 
-class HumanWin(IGameState):
+class HumanWin(GameState):
     def __bool__(self) -> Literal[False]:
         return False
 
     @property
-    def state_enum(self) -> Literal[GameState.HUMAN_WIN]:
-        return GameState.HUMAN_WIN
+    def state_enum(self) -> Literal[GameStateEnum.HUMAN_WIN]:
+        return GameStateEnum.HUMAN_WIN
 
     @property
     def is_human_win(self) -> Literal[True]:
@@ -252,12 +263,12 @@ class HumanWin(IGameState):
         self._print_human_won()
 
 
-class ComputerWin(IGameState):
+class ComputerWin(GameState):
     def __bool__(self) -> Literal[False]:
         return False
     @property
-    def state_enum(self) -> Literal[GameState.COMPUTER_WIN]:
-        return GameState.COMPUTER_WIN
+    def state_enum(self) -> Literal[GameStateEnum.COMPUTER_WIN]:
+        return GameStateEnum.COMPUTER_WIN
 
     @property
     def is_human_win(self) -> Literal[False]:
@@ -278,13 +289,13 @@ class ComputerWin(IGameState):
         self._print_computer_won()
 
 
-class Draw(IGameState):
+class Draw(GameState):
     def __bool__(self) -> Literal[False]:
         return False
 
     @property
-    def state_enum(self) -> Literal[GameState.DRAW]:
-        return GameState.DRAW
+    def state_enum(self) -> Literal[GameStateEnum.DRAW]:
+        return GameStateEnum.DRAW
 
     @property
     def is_human_win(self) -> Literal[False]:
@@ -325,28 +336,28 @@ class TicTacToe:
     COMPUTER_O = 2
 
     POLE_SIZE = 3
-    _states: dict[GameState, IGameState]
-    _state: IGameState
+    _states: dict[GameStateEnum, GameState]
+    _state: GameState
     pole: tuple[tuple[Cell, ...], ...]
 
     def __init__(self):
         self.init()
         self._states = {
-            GameState.NOT_STARTED: NotStarted(self),
-            GameState.COMPUTER_TURN: ComputerTurn(self),
-            GameState.HUMAN_TURN: HumanTurn(self),
-            GameState.COMPUTER_WIN: ComputerWin(self),
-            GameState.HUMAN_WIN: HumanWin(self),
-            GameState.DRAW: Draw(self),
+            GameStateEnum.NOT_STARTED: NotStarted(self),
+            GameStateEnum.COMPUTER_TURN: ComputerTurn(self),
+            GameStateEnum.HUMAN_TURN: HumanTurn(self),
+            GameStateEnum.COMPUTER_WIN: ComputerWin(self),
+            GameStateEnum.HUMAN_WIN: HumanWin(self),
+            GameStateEnum.DRAW: Draw(self),
         }
-        self.state = GameState.NOT_STARTED
+        self.state = GameStateEnum.NOT_STARTED
 
     def __setitem__(self, key: tuple[int, int], value: int):
         self._check_index(key)
         self._check_if_cell_is_free(key)
         self.pole[key[0]][key[1]].value = value
         new_state = self._state.define_turn_result(self.pole,
-                                                   GameState.HUMAN_TURN)
+                                                   GameStateEnum.HUMAN_TURN)
         if new_state is not None:
             self.state = new_state  # type: ignore
         self.show()
@@ -381,17 +392,17 @@ class TicTacToe:
         return self._state.is_draw
 
     @property
-    def state(self) -> IGameState:
+    def state(self) -> GameState:
         return self._state
 
     @state.setter
-    def state(self, state: GameState):
+    def state(self, state: GameStateEnum):
         self._state = self._states[state]
 
     def init(self):
         if hasattr(self, 'pole'):
             self._clear()
-            self.state = GameState.NOT_STARTED
+            self.state = GameStateEnum.NOT_STARTED
         else:
             self.pole = tuple(
                 tuple(Cell() for _ in range(self.POLE_SIZE))
@@ -420,7 +431,7 @@ class TicTacToe:
                 for cell in row
             ))
 
-    def _get_winner(self) -> GameState:
+    def _get_winner(self) -> GameStateEnum:
         pass
 
     def _clear(self):
