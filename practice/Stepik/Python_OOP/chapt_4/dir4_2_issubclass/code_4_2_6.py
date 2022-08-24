@@ -1,13 +1,13 @@
 from typing import Iterable
 
 
-class Tuple(tuple):
+class MyTuple(tuple):
     def __add__(self, other: Iterable):
-        return Tuple(super().__add__(tuple(other)))
+        return MyTuple(super().__add__(tuple(other)))
 
 
 if __name__ == '__main__':
-    tp = Tuple()
+    tp = MyTuple()
     print(type(tp))
     print(type(tp + "sldkfjj"))
 
