@@ -11,8 +11,7 @@ class Digit:
     def __repr__(self):
         return str(self._value)
 
-    @staticmethod
-    def _validate(value: float):
+    def _validate(self, value):
         if type(value) not in (int, float):
             raise TypeError('значение не соответствует типу объекта')
 
