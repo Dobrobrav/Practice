@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 
 class MetaSingleton(type):
-    _instances: Dict['MetaSingleton', Any] = {}
+    _instances: Dict[type, Any] = {}
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
