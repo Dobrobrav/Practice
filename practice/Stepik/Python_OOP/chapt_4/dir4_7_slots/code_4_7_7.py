@@ -64,15 +64,15 @@ class Notes(metaclass=MetaSingleton):
         for attr_name, note_name_ru in zip(self.__slots__, self._CYRILLIC_NOTES):
             setattr(self, attr_name, Note(note_name_ru, ton=0))
 
-    def __setitem__(self, key: int, value: int):
-        self._validate_index(value)
-        note_name = self.__slots__[key]
+    def __setitem__(self, index: int, ton: int):
+        self._validate_index(ton)
+        note_name = self.__slots__[index]
         note: Note = getattr(self, note_name)
-        note.ton = value
+        note.ton = ton
 
-    def __getitem__(self, item: int) -> Note:
-        self._validate_index(item)
-        note_name = self.__slots__[item]
+    def __getitem__(self, index: int) -> Note:
+        self._validate_index(index)
+        note_name = self.__slots__[index]
         return getattr(self, note_name)
 
     @staticmethod
