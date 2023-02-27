@@ -1,5 +1,5 @@
 import pytest
-from practice.Stepik.Python_OOP.c3_magic_methods.d9_iter_next \
+from Stepik.Python_OOP.c3_magic_methods.d9_iter_next \
     .code_5 import *
 
 
