@@ -2,6 +2,6 @@
 <project version="4">
   <component name="MypyConfigService">
     <option name="customMypyPath" value="Auto-detected" />
-    <option name="mypyConfigFilePath" value="C:\Users\User\Downloads\.aaaa\mypy-pycharm-release\config\checkstyle\checkstyle-suppressions.xml" />
+    <option name="mypyConfigFilePath" value="D:\УЧЁБА\Python\configs\mypy.cfg" />
   </component>
 </project>
