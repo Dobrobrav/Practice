@@ -1,28 +1,63 @@
-from string import ascii_lowercase, digits
+from typing import Callable, Literal
 
 
-def main():
-    string = "white5 red4 blue1 black3 purple2"
-    colors = get_colors_sorted_by_order(string)
+class Request:
+    method: str
 
-    print(colors)
-
-
-def get_colors_sorted_by_order(string: str) -> list[str]:
-    colors_with_order = string.split()
-    colors_with_order.sort(key=lambda color_with_order: _get_order(color_with_order))
-    res = [_get_color(color_with_order) for color_with_order in colors_with_order]
-
-    return res
+    def __init__(self,
+                 method: Literal['GET', 'POST']) -> None:
+        self.method = method
 
 
-def _get_order(string: str) -> int:
-    return int(string.lstrip(ascii_lowercase))
+class Response:
+    res: str
+
+    def __init__(self,
+                 res: str) -> None:
+        self.res = res
 
 
-def _get_color(string: str) -> str:
-    return string.rstrip(digits)
+class View:
+    @property
+    def http_method_names(self):
+        return list(self.FUNCTION_BY_METHOD.keys())
+    
+    def __init__(self,
+                 *args, **initkwargs) -> None:
+        self.args = args
+        self.initkwargs = initkwargs
+        self.FUNCTION_BY_METHOD = {
+            'GET': self.get,
+            'POST': self.post,
+        }
 
+    def __call__(self, request: Request,
+                 *args, **kwargs) -> Response:
+        ...
+        return self.dispatch(request, *args, **kwargs)
 
-if __name__ == '__main__':
-    main()
+    @classmethod
+    def as_view(cls: type,
+                *args, **initkwargs) -> Callable:
+        return cls(**initkwargs)
+
+    def dispatch(self, request: Request,
+                 *args, **kwargs) -> Response:
+        method_function = self.FUNCTION_BY_METHOD.get(
+            request.method, default=self.http_method_not_allowed
+        )
+        return method_function(request, *args, **kwargs)
+
+    def get(self,
+            request: Request,
+            *args, **kwargs) -> Response:
+        return Response(res='GET response')
+
+    def post(self,
+             request: Request,
+             *args, **kwargs) -> Response:
+        return Response(res='POST response')
+
+    def http_method_not_allowed(self, request: Request,
+                                *args, **kwargs) -> Response:
+        return Response(res=f'{request.method} method is not allowed')
